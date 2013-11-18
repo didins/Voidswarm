@@ -1,0 +1,45 @@
+#include "communicator.h"
+
+Communicator::Communicator()
+{
+    connected = false;
+}
+
+void Communicator::waitForConnection(int port)
+{
+    sf::TcpListener l;
+    if(l.listen(port) != sf::Socket::Done)
+        throw "Listening failed";
+    if(l.accept(socket) != sf::Socket::Done)
+        throw "Cannot accept client";
+    socket.setBlocking(false);
+}
+
+void Communicator::connectTo(char *ip, int port)
+{
+    if(socket.connect(ip, port) != sf::Socket::Done)
+        throw "Cannot connect to server";
+    socket.setBlocking(false);
+}
+
+void Communicator::send(Message m)
+{
+    char data[m.LEN];
+    int len;
+    m.toCString(data, len);
+    if(socket.send(data, len) != sf::Socket::Done)
+        throw "Cannot send data";
+}
+
+bool Communicator::receive(Message &m)
+{
+    char data[m.LEN];
+    int len;
+    sf::Socket::Status s = socket.receive(data, (std::size_t)m.LEN, (std::size_t&)len);
+    if(s == sf::Socket::NotReady)
+        return false;
+    else if(s != sf::Socket::Done)
+        throw "Cannot receive data";
+    m.fromCString(data, len);
+    return true;
+}
