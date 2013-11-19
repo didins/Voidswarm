@@ -343,7 +343,7 @@
 	<vector>
 	"communicator.h"
 
-1384809177 c:\users\dimitrije\voidswarm\communicator.h
+1384900377 c:\users\dimitrije\voidswarm\communicator.h
 	<SFML/Network.hpp>
 	"message.h"
 
@@ -418,14 +418,15 @@
 	<SFML/Network/Socket.hpp>
 	<vector>
 
-1384859361 c:\users\dimitrije\voidswarm\message.h
+1384900588 c:\users\dimitrije\voidswarm\message.h
 
-1384811978 c:\users\dimitrije\voidswarm\client.h
+1384900604 c:\users\dimitrije\voidswarm\client.h
 	"communicator.h"
+	<SFML/Graphics.hpp>
 
 1384809185 source:c:\users\dimitrije\voidswarm\communicator.cpp
 	"communicator.h"
 
-1384811937 source:c:\users\dimitrije\voidswarm\message.cpp
+1384859378 source:c:\users\dimitrije\voidswarm\message.cpp
 	"message.h"
 

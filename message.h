@@ -20,6 +20,13 @@ struct MsgClick
     MsgClick(int xx, int yy) { x = xx; y = yy; }
 } ;
 
+const short MSG_WHEEL = 2 | MSG_ENGINE;
+struct MsgWheel
+{
+    int x;
+    MsgWheel(int xx) { x = xx; }
+} ;
+
 class Message
 {
 public:
@@ -28,6 +35,7 @@ public:
     Message(int ty, int t) { type = ty; tick = t; }
     Message(MsgStart d, int t) { tick = t; type = MSG_START; d_start = d; }
     Message(MsgClick d, int t) { tick = t; type = MSG_CLICK; d_click = d; }
+    Message(MsgWheel d, int t) { tick = t; type = MSG_WHEEL; d_wheel = d; }
 
     void toCString(char[], int&);
     void fromCString(char[], int);
@@ -40,6 +48,8 @@ public:
 
     const MsgStart getStart() { return d_start; }
     const MsgClick getClick() { return d_click; }
+    const MsgWheel getWheel() { return d_wheel; }
+
 
     const static int LEN = 1024;
 private:
@@ -53,6 +63,7 @@ private:
         char bin[DATA_LEN];
         MsgStart d_start;
         MsgClick d_click;
+        MsgWheel d_wheel;
     } ;
 };
 
