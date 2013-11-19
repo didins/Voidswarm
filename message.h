@@ -32,8 +32,11 @@ public:
     void toCString(char[], int&);
     void fromCString(char[], int);
 
+    void setSender(int s) { sender = s; }
+
     int getTick() { return tick; }
-    int getType() { return type; }
+    short getType() { return type; }
+    short getSender() { return sender; }
 
     const MsgStart getStart() { return d_start; }
     const MsgClick getClick() { return d_click; }
@@ -43,7 +46,7 @@ private:
     const static int DATA_LEN = 64;
 
     int tick;
-    short type;
+    short type, sender;
 
     union
     {

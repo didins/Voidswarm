@@ -35,6 +35,7 @@ namespace Server
             for(int i = 0; i < n_players; i++)
                 if(players[i].receive(m))
                 {
+                    m.setSender(i);
                     for(int j = 0; j < n_players; j++)
                         players[j].send(m);
                 }
