@@ -19,7 +19,7 @@ int main()
     }
     catch(const char *err)
     {
-        printf("ERROR: %s!\n");
+        printf("ERROR: %s!\n", err);
         printf(".voidswarm will now exit.\n");
     }
 

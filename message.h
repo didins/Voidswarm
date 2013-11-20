@@ -6,8 +6,8 @@ const short MSG_ENGINE = 1 << 10; // flag "da li je ovo poruka za engine"
 const short MSG_START = 1;
 struct MsgStart
 {
-    int player_i;
-    MsgStart(int i) { player_i = i; }
+    int player_i, n_players;
+    MsgStart(int i, int n) { player_i = i; n_players = n; }
 } ;
 
 const short MSG_END = 2;
@@ -51,7 +51,7 @@ public:
     const MsgWheel getWheel() { return d_wheel; }
 
 
-    const static int LEN = 1024;
+    const static int LEN = 128;
 private:
     const static int DATA_LEN = 64;
 

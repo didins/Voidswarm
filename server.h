@@ -25,21 +25,25 @@ namespace Server
         }
 
         for(int i = 0; i < n_players; i++)
-            players[i].send(Message(MsgStart(i), 0));
+            players[i].send(Message(MsgStart(i, n_players), 0));
 
         printf("Started game.\n");
 
-        while(true)
+        bool running = true;
+        while(running)
         {
             Message m;
             for(int i = 0; i < n_players; i++)
                 if(players[i].receive(m))
                 {
+                    if(m.getType() == MSG_END) running = false;
                     m.setSender(i);
                     for(int j = 0; j < n_players; j++)
                         players[j].send(m);
                 }
         }
+
+        printf("Game finished.\n");
 
         return 0;
     }

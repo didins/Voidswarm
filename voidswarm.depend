@@ -1,5 +1,5 @@
 # depslib dependency file v1.0
-1384814508 source:c:\users\dimitrije\voidswarm\main.cpp
+1384980330 source:c:\users\dimitrije\voidswarm\main.cpp
 	<cstdio>
 	"server.h"
 	"client.h"
@@ -338,7 +338,7 @@
 	<string>
 	<vector>
 
-1384859386 c:\users\dimitrije\voidswarm\server.h
+1384984428 c:\users\dimitrije\voidswarm\server.h
 	<cstdio>
 	<vector>
 	"communicator.h"
@@ -418,13 +418,13 @@
 	<SFML/Network/Socket.hpp>
 	<vector>
 
-1384900588 c:\users\dimitrije\voidswarm\message.h
+1384984148 c:\users\dimitrije\voidswarm\message.h
 
-1384900604 c:\users\dimitrije\voidswarm\client.h
+1384984458 c:\users\dimitrije\voidswarm\client.h
 	"communicator.h"
 	<SFML/Graphics.hpp>
 
-1384809185 source:c:\users\dimitrije\voidswarm\communicator.cpp
+1384983257 source:c:\users\dimitrije\voidswarm\communicator.cpp
 	"communicator.h"
 
 1384859378 source:c:\users\dimitrije\voidswarm\message.cpp

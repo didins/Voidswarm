@@ -27,8 +27,15 @@ void Communicator::send(Message m)
     char data[m.LEN];
     int len;
     m.toCString(data, len);
-    if(socket.send(data, len) != sf::Socket::Done)
-        throw "Cannot send data";
+    sf::Socket::Status s = socket.send(data, len);
+    if(s != sf::Socket::Done)
+    {
+        if(s == sf::Socket::Disconnected)
+            throw "Cannot send data: socket is disconnected";
+        else if(s == sf::Socket::Error)
+            throw "Cannot send data: unexpected error";
+        else throw "Cannot send data";
+    }
 }
 
 bool Communicator::receive(Message &m)
@@ -39,7 +46,13 @@ bool Communicator::receive(Message &m)
     if(s == sf::Socket::NotReady)
         return false;
     else if(s != sf::Socket::Done)
-        throw "Cannot receive data";
+    {
+        if(s == sf::Socket::Disconnected)
+            throw "Cannot receive data: socket is disconnected";
+        else if(s == sf::Socket::Error)
+            throw "Cannot receive data: unexpected error";
+        else throw "Cannot receive data";
+    }
     m.fromCString(data, len);
     return true;
 }
