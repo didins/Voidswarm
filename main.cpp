@@ -20,6 +20,11 @@ int main()
     catch(const char *err)
     {
         printf("ERROR: %s!\n", err);
+
+        FILE *log = fopen("crash.txt", "w");
+        fprintf(log, "Crash reason: \"%s\"", err);
+        fclose(log);
+
         printf(".voidswarm will now exit.\n");
     }
 

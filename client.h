@@ -2,12 +2,17 @@
 #define CLIENT_H
 
 #include "communicator.h"
+#include "engine.h"
 #include <SFML/Graphics.hpp>
+#include <queue>
 
 namespace Client
 {
     int id; // redni broj igraca
     const int N_CIRCLES = 5;
+
+    const sf::Time TICK_DURATION = sf::milliseconds(40);
+    const int TICK_GAP = 10; // 400ms for now
 
     int main()
     {
@@ -29,61 +34,75 @@ namespace Client
 
         printf("Started!\n Player ID: %i\n", id);
 
-        sf::RenderWindow Game(sf::VideoMode(800, 600), ".voidswarm");
-        sf::CircleShape circles[n_players];
-        for (int i=0; i< n_players; i++)
-            circles[i].setRadius(50);
-        for(int i = 0; i < n_players; i++)
-        {
-            circles[i].setPosition(200 * (i % 3), 200 * (i / 3));
-            sf::Color col;
-            col.r = (i + 1) % 2 ? 255 : 0;
-            col.g = ((i + 1) / 2) % 2 ? 255 : 0;
-            col.b = ((i + 1) / 4) % 2 ? 255 : 0;
-            circles[i].setFillColor(col);
-        }
-        sf::Vector2i localPos1;
+        sf::RenderWindow window(sf::VideoMode(800, 600), ".voidswarm", sf::Style::Close);
+        Engine engine(n_players);
+        std::priority_queue<Message> messageBuffer;
+        sf::Clock clock;
 
-        while (Game.isOpen())
+        unsigned lastHash;
+
+        while(window.isOpen())
         {
-            Message move2;
-            while(comm.receive(move2))
+            if(clock.getElapsedTime() > TICK_DURATION * (sf::Int64)engine.getTick())
             {
-                if(move2.getType() == MSG_CLICK)
-                    circles[move2.getSender()].setPosition(move2.getClick().x-circles[move2.getSender()].getRadius(), move2.getClick().y-circles[move2.getSender()].getRadius());
-                if(move2.getType() == MSG_WHEEL)
+                engine.tick();
+                if(!(engine.getTick() & 31))
                 {
-                    if(move2.getWheel().x) circles[move2.getSender()].setRadius(circles[move2.getSender()].getRadius()+5);
-                    else circles[move2.getSender()].setRadius(circles[move2.getSender()].getRadius()-5);
+                    lastHash = engine.hash();
+                    Message msg(MsgHash(lastHash), engine.getTick() + TICK_GAP);
+                    comm.send(msg);
                 }
-                else if(move2.getType() == MSG_END) return 0;
+            }
+
+            Message msg;
+            while(comm.receive(msg))
+                messageBuffer.push(msg);
+
+            while(!messageBuffer.empty() && messageBuffer.top().getTick() <= engine.getTick())
+            {
+                msg = messageBuffer.top();
+                messageBuffer.pop();
+                if(msg.getTick() != engine.getTick())
+                    printf("[CLIENT] Received old message (%i) - ping too high!\n", engine.getTick() - msg.getTick());
+
+                if(msg.getType() & MSG_ENGINE)
+                    engine.process(msg);
+
+                switch(msg.getType())
+                {
+                case MSG_START:
+                    throw "MSG_START received; game already started";
+                    break;
+
+                case MSG_END:
+                    return 0;
+                    break;
+
+                case MSG_HASH:
+                    if(msg.getHash().hash != lastHash)
+                        throw "Desync";
+                }
             }
 
             sf::Event event;
-            while (Game.pollEvent(event))
+            while(window.pollEvent(event))
             {
-                if (event.type == sf::Event::Closed)
-                    Game.close();
-                if (event.type == sf::Event::MouseWheelMoved)
+                if(event.type == sf::Event::Closed)
+                    window.close();
+                else if(event.type == sf::Event::MouseWheelMoved)
                 {
-                    //if(event.mouseWheel.delta>0) circles[1].setRadius(circles[1].getRadius()+5);
-                    //else circles[1].setRadius(circles[1].getRadius()-5);
-                    Message resize1(MsgWheel(event.mouseWheel.delta>0), 0);
-                    comm.send(resize1);
+                    Message msg(MsgResize(event.mouseWheel.delta), engine.getTick() + TICK_GAP);
+                    comm.send(msg);
                 }
-                if(event.type == sf::Event::MouseButtonPressed)
+                else if(event.type == sf::Event::MouseButtonPressed)
                 {
-                    //localPos1=sf::Mouse::getPosition(Game);
-                    //circles[1].setPosition(localPos1.x-circles[1].getRadius(), localPos1.y-circles[1].getRadius());
-                    Message move1(MsgClick(event.mouseButton.x, event.mouseButton.y), 0);
-                    comm.send(move1);
+                    Message msg(MsgSetTarget(event.mouseButton.x, event.mouseButton.y), engine.getTick() + TICK_GAP);
+                    comm.send(msg);
                 }
             }
 
-            Game.clear();
-            for(int i = 0; i < n_players; i++)
-                Game.draw(circles[i]);
-            Game.display();
+            engine.draw(window);
+            window.display();
         }
 
         comm.send(Message(MSG_END, 0));

@@ -24,7 +24,7 @@ void Communicator::connectTo(char *ip, int port)
 
 void Communicator::send(Message m)
 {
-    char data[m.LEN];
+    unsigned char data[m.LEN];
     int len;
     m.toCString(data, len);
     sf::Socket::Status s = socket.send(data, len);
@@ -40,7 +40,7 @@ void Communicator::send(Message m)
 
 bool Communicator::receive(Message &m)
 {
-    char data[m.LEN];
+    unsigned char data[m.LEN];
     int len;
     sf::Socket::Status s = socket.receive(data, (std::size_t)m.LEN, (std::size_t&)len);
     if(s == sf::Socket::NotReady)
